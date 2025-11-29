@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: rqueue-priority-load-test
+  data:
+    redis:
+      database: 0
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      client-type: LETTUCE
+      lettuce:
+        read-from: MASTER_PREFERRED
+
+management:
+  endpoint:
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+rqueue:
+  job:
+    enabled: false
+  message:
+    durability:
+      in-terminal-state: 0
+
+rqueue-custom:
+  listener-factory-priority-mode: STRICT
+  listener-factory-back-off-time-in-millis: 10000
+  listener-factory-polling-interval-in-millis: 100
+  listener-factory-max-num-workers: 3
+  listener-concurrency: 3
+  listener-batch-size: 10000
+  listener-priority: high=80,medium=40,low=10

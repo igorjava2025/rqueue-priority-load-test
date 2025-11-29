@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  app:
+    image: azul/zulu-openjdk:21.0.6-jre
+    volumes:
+      - ./build/libs/rqueue-priority-load-test-1.0.0.jar:/app.jar
+    ports:
+      - "8080:8080"
+    command: java -Xmx512m -Xms512m -jar /app.jar
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: '1g'
+        reservations:
+          cpus: '4.0'
+          memory: '1g'
+    depends_on:
+      - redis
+    networks:
+      - app-network
+    environment:
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+
+  redis:
+    image: redis:7.2-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
