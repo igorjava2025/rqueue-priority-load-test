@@ -1,18 +1,13 @@
 package rqueuepriorityloadtest.service
 
 import com.github.sonus21.rqueue.annotation.RqueueListener
-import com.github.sonus21.rqueue.core.RqueueMessageManager
-import com.github.sonus21.rqueue.listener.RqueueMessageHeaders
-import com.github.sonus21.rqueue.utils.PriorityUtils
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
-import org.springframework.messaging.handler.annotation.Header
 import org.springframework.stereotype.Service
 
 @Service
 class RqueueListener(
     private val meterRegistry: MeterRegistry,
-    private val rqueueMessageManager: RqueueMessageManager,
 ) {
 
     @RqueueListener(
@@ -23,7 +18,6 @@ class RqueueListener(
     )
     fun onMessage(
         message: String,
-        @Header(RqueueMessageHeaders.ID) messageId: String,
     ) {
         logger.debug { "rqueue listener: process message '$message'" }
         val priority = priority(message)
@@ -32,8 +26,6 @@ class RqueueListener(
             meterRegistry.counter("listener_error", "priority", "unknown").increment()
             return
         }
-        val priorityRqueueName = PriorityUtils.getQueueNameForPriority(QUEUE_NAME, priority.getQueueNamePrioritySuffix())
-        rqueueMessageManager.deleteMessage(priorityRqueueName, messageId)
         meterRegistry.counter(
             "processed_message",
             "priority",
