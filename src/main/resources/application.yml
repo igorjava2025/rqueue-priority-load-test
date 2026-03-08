@@ -27,10 +27,13 @@ rqueue:
       in-terminal-state: 0
 
 rqueue-custom:
-  listener-factory-priority-mode: STRICT
+  #listener-factory-priority-mode: STRICT
+  listener-factory-priority-mode: HARD_STRICT
   listener-factory-back-off-time-in-millis: 10000
   listener-factory-polling-interval-in-millis: 100
   listener-factory-max-num-workers: 3
   listener-concurrency: 3
   listener-batch-size: 10000
   listener-priority: high=80,medium=40,low=10
+  poller-after-poll-sleep-interval: 30
+  poller-semaphore-wait-time: 15
